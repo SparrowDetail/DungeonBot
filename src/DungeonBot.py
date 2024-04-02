@@ -1,8 +1,7 @@
 from io import BytesIO
 import discord
 from discord.ext import commands
-from random import randint
-import DiceRollImageGenerator as genImg
+from DiceRollImageGenerator import BoundedImage
 from DiceRollImageGenerator import RollValueAndTypeError
 
 intents = discord.Intents.default()
@@ -28,37 +27,25 @@ async def roll(ctx, arg):
     """
     try:
         numberOfDieRolled, dieType = str(arg).upper().split('D')
-        print(f"Rolls: {numberOfDieRolled}\nDie Type: {dieType}")
 
-        rollValues = __createRollValues__(int(dieType), int(numberOfDieRolled))
-        rollImageByteArray: BytesIO = genImg.generateDieByteArray(rollValues, int(dieType))
-        rollImageByteArray.seek(0)
+        generatedImage = BoundedImage(dieType=dieType, rollCount=numberOfDieRolled)
+        imageByteArray: BytesIO = generatedImage.getByteArray()
+        generatedImage.close()
 
-        discordImageFile = discord.File(fp=rollImageByteArray, filename="rollImage.png")
+        discordImageFile = discord.File(fp=imageByteArray, filename="rollImage.png")
         embed = discord.Embed(color=discord.Color.dark_green())
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
         embed.set_image(url="attachment://rollImage.png")
         await ctx.send(file=discordImageFile, embed=embed)
 
-        rollImageByteArray.close()
+        imageByteArray.close()
     except (ValueError):
         await ctx.send(f"Roll must be entered in the form XdY, where X is the number of dice rolled and Y is a valid die type. You entered: {arg}")
     except (RollValueAndTypeError):
         await ctx.send(f'Sorry, I can only roll up to four dice right now. You tried to roll: {numberOfDieRolled}D{dieType}')
-
-def __createRollValues__(sidesOnDie:int, amountRolled:int) -> list:
-    """
-    Generates a list of int values representing the values resulting from a die rolled a specified number of times with a specified number of faces.
-
-    :param sidesOnDie: int representing the number of sides on a die
-    :param amountRolled: int representing the number of times a die is rolled
-    """
-    rolls:list = []
-
-    for i in range(0,amountRolled):
-        rolls.append(randint(1,sidesOnDie))
-
-    return rolls
+    except (OSError):
+        #TODO: incorporate logger - advanced setup
+        await ctx.send(f'Sorry, something went wrong...')
 
 if __name__ == "__main__":
     token = ""
