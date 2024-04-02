@@ -28,10 +28,11 @@ async def roll(ctx, arg):
     try:
         numberOfDieRolled, dieType = str(arg).upper().split('D')
 
-        generatedImage = BoundedImage(dieType=dieType, rollCount=numberOfDieRolled)
+        generatedImage = BoundedImage(dieType=int(dieType), rollCount=int(numberOfDieRolled))
         imageByteArray: BytesIO = generatedImage.getByteArray()
         generatedImage.close()
 
+        imageByteArray.seek(0)
         discordImageFile = discord.File(fp=imageByteArray, filename="rollImage.png")
         embed = discord.Embed(color=discord.Color.dark_green())
         embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
