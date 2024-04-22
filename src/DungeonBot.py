@@ -1,8 +1,15 @@
+#import asyncio
+#import logging
+#import logging.handlers
+#import os
+
 from io import BytesIO
 import discord
 from discord.ext import commands
 from DiceRollImageGenerator import BoundedImage
 from DiceRollImageGenerator import RollValueAndTypeError
+
+#from typing import List, Optional
 
 intents = discord.Intents.default()
 intents.message_content = True
