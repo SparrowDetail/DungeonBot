@@ -12,7 +12,7 @@ Pillow(Fork) recommends running within a [virtual environment(venv)](https://doc
 All commands currently utilize a "!" prefix, but the project is slated to move towards 'slashcommands'
 
 ### Roll
-Generate a set of rolls from a set of traditional DnD die types (D2, D4, D6, D8, D10, D12, D20). Currently, you can only roll up to four dice.
+Generate a set of rolls from a traditional DnD die (D2, D4, D6, D8, D10, D12, D20). Currently, you can only roll up to four dice.
 All arguments must be in the form 'XdY', where 'X' is the number of die you wish to roll and 'Y' is the type of die you wish to roll, example:
 
 ![RollImage](.readme/roll_sample.png)
