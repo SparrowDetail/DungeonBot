@@ -70,7 +70,6 @@ def rollImage(die_max_face: int, amount_of_rolls: int, filename: str = "image.pn
         for i in required_assets:
             assets[i] = Image.open(f'{ASSETS_DIRECTORY}D{die_max_face}_{i}.png')
             if (assets[i].width > asset_maximum_width):
-                print(assets[i].width)
                 asset_maximum_width = assets[i].width
             if (assets[i].height > asset_maximum_height):
                 asset_maximum_height = assets[i].height
