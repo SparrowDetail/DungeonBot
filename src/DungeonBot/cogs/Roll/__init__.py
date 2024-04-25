@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from io import BytesIO
-from DungeonBot.cogs.Roll.dieImage import rollImage, RollValueAndTypeError
+from DungeonBot.cogs.Roll.dieImage import rollImage
 
 class Roll(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -21,6 +21,13 @@ class Roll(commands.Cog):
     
     @commands.command()
     async def roll(self, ctx, arg):
+        """
+        Bot command that accepts input in the form XdY, where X represents a number of dice the user wishes to roll and Y represents a
+        die type present in a typical DnD die set (2, 4, 6, 8, 10, 12, 20). Currently, only up to four die may be generated.
+
+        :param ctx: Discord context that command is being executed within
+        :param arg: Command passed within the discord context, expected to be in the form XdY
+        """
         try:
             numberOfDieRolled, dieType = str(arg).upper().split('D')
             filename:str = "rollImage.png"
@@ -34,21 +41,18 @@ class Roll(commands.Cog):
             #Creates embed and sets author header and roll field
             embed = discord.Embed(color=discord.Color.dark_green())
             embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
-            embed.add_field(name=f'Roll {numberOfDieRolled}D{dieType}',value=f'**Total: {total_roll_value}**', inline=False)
+            embed.add_field(name=f'Roll: {numberOfDieRolled}D{dieType}',value=f'**Total: {total_roll_value}**', inline=False)
             
             #Converts image byte array to a Discord file
             discord_image_file = discord.File(fp=image_byte_array, filename=filename)
             embed.set_image(url=f"attachment://{filename}")
             
             await ctx.send(file=discord_image_file, embed=embed)  
-        except ValueError:
-            await ctx.send(f"Roll must be entered in the form XdY, where X is the number of dice rolled and Y is a valid die type. You entered: {arg}")
-        except RollValueAndTypeError as error:
+        except ValueError as error:
             await ctx.send(error)
         except FileNotFoundError as error:
             await ctx.send(error)
         except (OSError):
-            #TODO: incorporate logger - advanced setup
             await ctx.send(f'Sorry, something went wrong...')
         finally:
             image_byte_array.close()

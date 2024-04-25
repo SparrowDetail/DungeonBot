@@ -33,7 +33,7 @@ def rollImage(die_max_face: int, amount_of_rolls: int, filename: str = "image.pn
     :param die_max_face: Integer representing the max face on a typical DnD die (2, 4, 6, 8, 10, 12, 20)
     :param amount_of_rolls: Integer representing the amount of times the die will be rolled, must be between 1 and 4 (inclusive)
     :param filename: The name of the discord file being returned, 'image.png' by default
-    :raise RollValueAndTypeError: Raised where die_max_face or amount_of_rolls is invalid
+    :raise ValueError: Raised where die_max_face or amount_of_rolls is invalid
     :raise FileNotFoundError: Raised when a die asset cannot be found, must exist within Assets directory with proper naming convention ("D6_1.png")
     :return: Returns the image within a discord.File object and the calculated total of the rolls as an integer, or None where an exception is raised
     """
@@ -41,11 +41,12 @@ def rollImage(die_max_face: int, amount_of_rolls: int, filename: str = "image.pn
     if not _is_valid_type_and_roll(dieType=die_max_face, amount=amount_of_rolls):
         raise RollValueAndTypeError(f'Your roll must be a valid DnD die type {ACCEPTED_DIE_TYPES} any you may only roll up to four die. You tried to roll: {die_max_face}D{amount_of_rolls}')
 
+    #Roll value creation variables
     die: Die = Die(die_max_face)
     rolls: list[int] = []
     required_assets: set = set()
     
-    #Generate die roll values and a set containing only the needed assets
+    #Generate die roll values and a set containing only the required assets
     for i in range(amount_of_rolls):
         rolls.append(die.roll())
         required_assets.add(rolls[i])
@@ -53,41 +54,56 @@ def rollImage(die_max_face: int, amount_of_rolls: int, filename: str = "image.pn
     #Calculated total to be returned
     total: int = sum(rolls)
 
-    #Compile a blank image using Pillow(Fork)
-    blank_width: int = 10
-    for i in range(0, amount_of_rolls):
-        blank_width = blank_width + ASSET_WIDTH + 10
-    blank: Image = Image.new(mode="RGBA", size=(blank_width, ASSET_HEIGHT))
-
     #Generation variables
     asset_X_coordinate_pointer: int = 10
     asset_y_coordinate = 0
     assets: dict = {}
     image_byte_array: BytesIO = BytesIO()
+    blank: Image
 
     try:
-        #Pre-load all required assets
+        #blank base image generation variables
+        asset_maximum_width: int = 0
+        asset_maximum_height: int = 0
+
+        #Pre-load all required assets and initialize asset maximum height and width values
         for i in required_assets:
             assets[i] = Image.open(f'{ASSETS_DIRECTORY}D{die_max_face}_{i}.png')
+            if (assets[i].width > asset_maximum_width):
+                print(assets[i].width)
+                asset_maximum_width = assets[i].width
+            if (assets[i].height > asset_maximum_height):
+                asset_maximum_height = assets[i].height
+        
+        #Generate blank image
+        blank_width: int = 10
+        for i in range(0, amount_of_rolls):
+            blank_width = blank_width + asset_maximum_width + 10
+        blank = Image.new(mode="RGBA", size=(blank_width, asset_maximum_height))
         
         #Paste each asset within the generated blank image
         for i in rolls:
             blank.paste(assets[i], (asset_X_coordinate_pointer, asset_y_coordinate))
             asset_X_coordinate_pointer = asset_X_coordinate_pointer + ASSET_WIDTH + 10
         
-        #convert the image to a byte array and save it to a discord file
+        #convert the image to a byte array
         blank.save(image_byte_array, format="PNG")
 
         return (image_byte_array, total)
     except FileNotFoundError:
-        raise RollValueAndTypeError("Sorry, a die asset appears to be missing or corrupted. Please contact your admin!")
+        raise DieAssetNotFoundError("Sorry, a die asset appears to be missing or corrupted. Please contact your admin!")
+    except Exception as e:
+        print(e)
     finally:
         # Close all open class calls
         for key in assets:
             assets[key].close()
         blank.close()
 
-def _is_valid_type_and_roll(dieType, amount) -> bool:
+def _is_valid_type_and_roll(dieType: int, amount: int) -> bool:
+    """
+    Validates die values are within a declared set of accepted values and 
+    """
     if dieType not in ACCEPTED_DIE_TYPES:
         return False
     if not amount >= 1 and not amount <= 4:
@@ -95,11 +111,21 @@ def _is_valid_type_and_roll(dieType, amount) -> bool:
     return True
 
 
-class RollValueAndTypeError(Exception):
+class RollValueAndTypeError(ValueError):
     def __init__(self, msg="Invalid die entry") -> None:
         """
         Error class used to validate key image generation factors. A RollValueAndTypeError is raised when the die type or die roll values
         don't meet the expected bounds.
+
+        :inherit Exception:
+        """
+        self.msg = msg
+        super().__init__(self.msg)
+
+class DieAssetNotFoundError(FileNotFoundError):
+    def __init__(self, msg="Die asset not found") -> None:
+        """
+        Error class used to validate die asset presence. Raised when a die asset is missing, corrupted, and/or named improperly (i.e. "D6_1.png").
 
         :inherit Exception:
         """

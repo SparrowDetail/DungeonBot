@@ -11,12 +11,12 @@ class DungeonBot(commands.Bot):
         super().__init__(command_prefix=commands.when_mentioned_or("!"), intents=intents)
     
     async def on_ready(self):
-        """
-        Occurs when bot is finished setting up, indicates when the bot is ready
-        """
         print(f'Logged in: {self.user}!\n')
 
     async def setup_hook(self) -> None:
+        """
+        Gathers command extensions from cogs, imported from cogs.
+        """
         print("Seeking cogs...")
 
         for ext in extensions:
