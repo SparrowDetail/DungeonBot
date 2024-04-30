@@ -18,9 +18,9 @@ def get_initiative_embed(user_id: int) -> discord.Embed:
     items = orderDB.get_initiative_order(user_id)
     index = 1
     for item in items:
-        r = item[2]
-        m = item[3]
-        embed.add_field(name=f"{index}. {item[1]}", value=f"{r+m} ({r} + {m})", inline=False)
+        r = item[1]
+        m = item[2]
+        embed.add_field(name=f"{index}. {item[0]}", value=f"{r+m} ({r} + {m})", inline=False)
         index = index + 1
     return embed
 
