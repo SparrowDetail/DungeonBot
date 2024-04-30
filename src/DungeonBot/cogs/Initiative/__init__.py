@@ -129,9 +129,9 @@ class initiative(app_commands.Group):
     async def private(self, interaction: discord.Interaction):
         """Direct message the user for private order entry"""
         try:
-            await interaction.user.send("""
-                        Use `/interaction [add, remove, or clear]` to manage you initiative order!\n
-                        Use `/interaction show` to share your initiative order back in the target channel.""")
+            msg = "Use `/interaction [add, remove, or clear]` to manage you initiative order!\n"
+            msg = msg + "Use `/interaction show` to share your initiative order back in the target channel."
+            await interaction.user.send(msg)
             await interaction.response.send_message("I DM'd you!")
         except Exception as e:
             await interaction.response.send_message(content="Something went wrong")
