@@ -17,6 +17,7 @@ ROLL = "roll_value"
 MODIFIER = "modifier"
 
 def init_user_table():
+    """Initializes the users table if one does not exist"""
     conn = sqlite3.Connection(DATABASE_DIRECTORY)
     conn.execute("PRAGMA foreign_keys = ON;")
     cursor = conn.cursor()
@@ -30,6 +31,10 @@ def init_user_table():
     conn.close()
 
 def init_order_table():
+    """
+    Initializes the order command table if does not exist. Used in generating and
+    maintaining initiative orders.
+    """
     conn = sqlite3.Connection(DATABASE_DIRECTORY)
     conn.execute("PRAGMA foreign_keys = ON;")
     cursor = conn.cursor()
@@ -49,10 +54,12 @@ def init_order_table():
     conn.close()
 
 def vacuum():
+    """Executes the SQLite 'VACUUM' command to free unused memory"""
     conn = sqlite3.Connection(DATABASE_DIRECTORY)
-    conn.execute("VACUUM")
+    conn.execute("VACUUM;")
     conn.close()
 
+#Initialize the database
 init_user_table()
 init_order_table()
 vacuum()
