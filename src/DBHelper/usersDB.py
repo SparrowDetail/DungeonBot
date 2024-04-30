@@ -38,7 +38,6 @@ def get_user(user_id: int):
 
     cursor.execute(f"SELECT {ID} FROM {USERS_TABLE} WHERE {ID} = {user_id};")
     id = cursor.fetchone()
-    print(type(id))
 
     conn.close()
     return id
