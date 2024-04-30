@@ -22,4 +22,11 @@ class DungeonBot(commands.Bot):
         for ext in extensions:
             await self.load_extension(f"DungeonBot.cogs.{ext}")
 
+        print("Syncing command tree...")
+        try:
+            synced = await self.tree.sync()
+            print(f"Synced command tree: {len(synced)} commands synced")
+        except Exception as e:
+            print(e)
+
 DungeonBot = DungeonBot()
