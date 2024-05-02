@@ -11,7 +11,7 @@ def get_initiative_embed(user_id: int) -> discord.Embed:
     Formats and returns a discord Embed containing a target users initiative 
     order roles
 
-    :param user_id: The target users discord user id
+    :param user_id: The target user's discord user id
     :return discord.Embed: A formatted Embed object
     """
     embed = discord.Embed(color=discord.Color.dark_green(), title="Initiative Order")
@@ -52,7 +52,7 @@ class initiative(app_commands.Group):
             msg = f"{char_name} added: roll({roll}), modifier({modifier}), initiative({roll+modifier})"
             await interaction.response.send_message(content=msg)
         except Exception as e:
-            await interaction.response.send_message(content="Something went wrong")
+            await interaction.response.send_message("Something went wrong")
             print(e)
 
     @app_commands.command()
@@ -74,7 +74,28 @@ class initiative(app_commands.Group):
             await interaction.response.send_message(embed=embed)
         except Exception as e:
             print(e)
-            await interaction.response.send_message(content="Order too long")
+            await interaction.response.send_message("Order too long")
+    
+    @app_commands.command()
+    @app_commands.describe(
+        char_name = "Character name", 
+        roll_value = "Die roll value (typically a D20)",
+        modifier = "Roll modifier (i.e. 1 or -1)"
+        )
+    async def insert(self, interaction: discord.Interaction, char_name: str, roll_value: int, modifier: int):
+        """Insert a character with a custom roll value"""
+        user_id: int = interaction.user.id
+
+        try:
+            usersDB.verify_or_add_user(user_id)
+            
+            orderDB.add_order_command(user_id, char_name, roll_value, modifier)
+
+            msg = f"{char_name} added: roll({roll_value}), modifier({modifier}), initiative({roll_value+modifier})"
+            await interaction.response.send_message(content=msg)
+        except Exception as e:
+            await interaction.response.send_message(f"Something went wrong")
+            print(e)
     
     @app_commands.command()
     @app_commands.describe(
@@ -122,7 +143,7 @@ class initiative(app_commands.Group):
             embed = get_initiative_embed(interaction.user.id)
             await interaction.response.send_message(embed=embed)
         except Exception as e:
-            await interaction.response.send_message(content="Something went wrong")
+            await interaction.response.send_message("Something went wrong")
             print(e)
     
     @app_commands.command()
@@ -134,7 +155,7 @@ class initiative(app_commands.Group):
             await interaction.user.send(msg)
             await interaction.response.send_message("I DM'd you!")
         except Exception as e:
-            await interaction.response.send_message(content="Something went wrong")
+            await interaction.response.send_message("Something went wrong")
             print(e)
         
 async def setup(bot: commands.Bot):
