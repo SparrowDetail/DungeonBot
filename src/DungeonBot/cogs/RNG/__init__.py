@@ -12,7 +12,7 @@ class RNG(app_commands.Group):
         amount = "Number of die to roll (1 to 4)"
     )
     async def roll(self, interaction: discord.Interaction, die_type: int, amount: int):
-        """Roll an existing die up to four times"""
+        """Roll an existing die up to five times"""
         try:
             filename:str = "rollImage.png"
 
