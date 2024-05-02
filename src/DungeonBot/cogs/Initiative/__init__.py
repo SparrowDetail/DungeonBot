@@ -4,7 +4,7 @@ from discord import app_commands
 
 import DBHelper
 from DBHelper import usersDB, orderDB
-from DungeonBot.cogs.Roll.dieImage import Die
+from DungeonBot.cogs.RNG.dieImage import Die
 
 def get_initiative_embed(user_id: int) -> discord.Embed:
     """
