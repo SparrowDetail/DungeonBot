@@ -32,6 +32,10 @@ Generate and display an embed containing the users initiative rolls
 Commands used to add characters to the initiative order. Requires the user to enter a character name (string) and a roll modifier (integer). The `add`
 command will simply add the data to the table, while the `add_show` command will add the data and generate a new embed to display to the users.
 
+### `/initiative insert`
+Functions similarly to `/initiative add`, but allows the user to enter a custom roll value. This was implemented for those that wish to roll realworld
+dice over computer generated random values.
+
 ### `/initiative remove` and `/initiative remove_show`
 Commands used to remove characters from the initiative order. Requires the user to enter a character name (string) that they wish to remove. The `remove`
 command will simply remove the data from the table, while the `remove_show` command will remove the data and generate a new embed to display to the users.
