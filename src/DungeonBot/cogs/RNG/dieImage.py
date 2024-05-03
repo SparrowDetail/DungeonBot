@@ -39,7 +39,7 @@ def rollImage(die_max_face: int, amount_of_rolls: int, filename: str = "image.pn
     """
     #Verifies dieMaxFace and amount_of_rolls are accepted values
     if not _is_valid_type_and_roll(dieType=die_max_face, amount=amount_of_rolls):
-        raise RollValueAndTypeError(f'Your roll must be a valid DnD die type {ACCEPTED_DIE_TYPES} any you may only roll up to four die. You tried to roll: {die_max_face}D{amount_of_rolls}')
+        raise RollValueAndTypeError(f'Your roll must be a valid DnD die type {ACCEPTED_DIE_TYPES} any you may only roll up to five dice. You tried to roll: {amount_of_rolls}D{die_max_face}')
 
     #Roll value creation variables
     die: Die = Die(die_max_face)
@@ -101,11 +101,11 @@ def rollImage(die_max_face: int, amount_of_rolls: int, filename: str = "image.pn
 
 def _is_valid_type_and_roll(dieType: int, amount: int) -> bool:
     """
-    Validates die values are within a declared set of accepted values and 
+    Validates die values are within a declared set of accepted values and within an accepted range of roll values
     """
     if dieType not in ACCEPTED_DIE_TYPES:
         return False
-    if not amount >= 1 and not amount <= 4:
+    if not (amount >= 1 and amount <= 5):
         return False
     return True
 
