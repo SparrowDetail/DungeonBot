@@ -9,13 +9,22 @@ A discord bot geared towards providing DnD utilities to a discord server
 Pillow(Fork) recommends running within a [virtual environment(venv)](https://docs.python.org/3/library/venv.html)
 
 # Cogs
-Roll commands currently utilize a "!" prefix. New commands will utalize 'slashcommands.'
+All user commands utilize the discord.py app_command structure to register the bot commands as 'slashcommands.' Below is a sample use of the
+`rng` command group `roll` command:
 
-## Roll
-Generate a set of rolls from a traditional DnD die (D2, D4, D6, D8, D10, D12, D20). Currently, you can only roll up to four dice.
-All arguments must be in the form 'XdY', where 'X' is the number of die you wish to roll and 'Y' is the type of die you wish to roll, example:
+![slash_command](.readme/sample_command1.png)
 
-![RollImage](.readme/roll_sample.png)
+![roll_command](.readme/sample_command2.png)
+
+## RNG
+Random number generation commands.
+
+### `/rng roll`
+Allows the user to roll up to four dice from an accepted list of available die assets (D2, D4, D6, D8, D10, D12, and D20)
+
+### `/rng random`
+Generates 1 to 10 random values with a specified head size. The head must be a positive integer greater than 0. For example, a head of 100
+will generate a random value from 1 to 100.
 
 ## Initiative
 Provides commands that allow users to create and manage initiative order tables. These are generated per-user based on their unique discord user
