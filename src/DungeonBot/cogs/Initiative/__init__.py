@@ -26,116 +26,17 @@ def get_initiative_embed(user_id: int) -> discord.Embed:
 
 class initiative(app_commands.Group):
     @app_commands.command()
-    async def clear(self, interaction: discord.Interaction):
-        """Empty the initiative order"""
-        user_id: int = interaction.user.id
-        orderDB.clear_user_order(user_id)
-        DBHelper.vacuum()
-        await interaction.response.send_message(content="Initiative order cleared!")
-
-    @app_commands.command()
-    @app_commands.describe(
-        char_name = "Character name", 
-        modifier = "Roll modifier (i.e. 1 or -1)"
-        )
-    async def add(self, interaction: discord.Interaction, char_name: str, modifier: int):
-        """Add a character to the initiative order"""
-        user_id = interaction.user.id
-
+    async def private(self, interaction: discord.Interaction):
+        """Direct message the user for private order entry"""
         try:
-            usersDB.verify_or_add_user(user_id)
-
-            die: Die = Die(20)
-            roll = die.roll()
-            orderDB.add_order_command(user_id, char_name, roll, modifier)
-
-            msg = f"{char_name} added: roll({roll}), modifier({modifier}), initiative({roll+modifier})"
-            await interaction.response.send_message(content=msg)
+            msg = "Use `/interaction [add, remove, or clear]` to manage you initiative order!\n"
+            msg = msg + "Use `/interaction show` to share your initiative order back in the target channel."
+            await interaction.user.send(msg)
+            await interaction.response.send_message("I DM'd you!")
         except Exception as e:
             await interaction.response.send_message("Something went wrong")
             print(e)
-
-    @app_commands.command()
-    @app_commands.describe(
-        char_name = "Character name", 
-        modifier = "Roll modifier (i.e. 1 or -1)"
-        )
-    async def add_show(self, interaction: discord.Interaction, char_name: str, modifier: int):
-        """Add a character to the initiative order with a modifier and show the order"""
-        user_id: int = interaction.user.id
-
-        try:
-            usersDB.verify_or_add_user(user_id)
-            
-            die: Die = Die(20)
-            orderDB.add_order_command(user_id, char_name, die.roll(), modifier)
-
-            embed = get_initiative_embed(user_id)
-            await interaction.response.send_message(embed=embed)
-        except Exception as e:
-            print(e)
-            await interaction.response.send_message("Order too long")
     
-    @app_commands.command()
-    @app_commands.describe(
-        char_name = "Character name", 
-        roll_value = "Die roll value (typically a D20)",
-        modifier = "Roll modifier (i.e. 1 or -1)"
-        )
-    async def insert(self, interaction: discord.Interaction, char_name: str, roll_value: int, modifier: int):
-        """Insert a character with a custom roll value"""
-        user_id: int = interaction.user.id
-
-        try:
-            usersDB.verify_or_add_user(user_id)
-            
-            orderDB.add_order_command(user_id, char_name, roll_value, modifier)
-
-            msg = f"{char_name} added: roll({roll_value}), modifier({modifier}), initiative({roll_value+modifier})"
-            await interaction.response.send_message(content=msg)
-        except Exception as e:
-            await interaction.response.send_message(f"Something went wrong")
-            print(e)
-    
-    @app_commands.command()
-    @app_commands.describe(
-        char_name = "Character name"
-        )
-    async def remove(self, interaction: discord.Interaction, char_name: str):
-        """Remove a character from the initiative order"""
-        user_id = interaction.user.id
-
-        try:
-            usersDB.verify_or_add_user(user_id)
-
-            if orderDB.remove_one_order(user_id, char_name):
-                await interaction.response.send_message(f"{char_name} removed!")
-            else:
-                await interaction.response.send_message(f"{char_name} does not exist")
-        except Exception as e:
-            await interaction.response.send_message(f"Something went wrong")
-            print(e)
-
-    @app_commands.command()
-    @app_commands.describe(
-        char_name = "Character name"
-        )
-    async def remove_show(self, interaction: discord.Interaction, char_name: str):
-        """Remove a character from the initiative order and show the order"""
-        user_id = interaction.user.id
-
-        try:
-            usersDB.verify_or_add_user(user_id)
-
-            if orderDB.remove_one_order(user_id, char_name):
-                embed = get_initiative_embed(user_id)
-                await interaction.response.send_message(embed=embed)
-            else:
-                await interaction.response.send_message(f"{char_name} does not exist")
-        except Exception as e:
-            await interaction.response.send_message(f"{char_name} does not exist")
-            print(e)
-
     @app_commands.command()
     async def show(self, interaction: discord.Interaction):
         """Display current initiative order"""
@@ -147,15 +48,68 @@ class initiative(app_commands.Group):
             print(e)
     
     @app_commands.command()
-    async def private(self, interaction: discord.Interaction):
-        """Direct message the user for private order entry"""
+    async def clear(self, interaction: discord.Interaction):
+        """Empty the initiative order"""
+        user_id: int = interaction.user.id
+        orderDB.clear_user_order(user_id)
+        DBHelper.vacuum()
+        await interaction.response.send_message(content="Initiative order cleared!")
+
+    @app_commands.command()
+    @app_commands.describe(
+        char_name = "Character name", 
+        modifier = "Roll modifier (i.e. 1 or -1)",
+        roll_value = "Specify a roll value (digitally generated otherwise)",
+        show = "Show the initiative order after adding"
+        )
+    async def add(self, interaction: discord.Interaction, char_name: str, modifier: int = 0, roll_value: int = None, show: bool = False):
+        """Add a character to the initiative order"""
+        user_id = interaction.user.id
+
         try:
-            msg = "Use `/interaction [add, remove, or clear]` to manage you initiative order!\n"
-            msg = msg + "Use `/interaction show` to share your initiative order back in the target channel."
-            await interaction.user.send(msg)
-            await interaction.response.send_message("I DM'd you!")
+            usersDB.verify_or_add_user(user_id)
+
+            #Generate a D20 roll where roll isn't specified
+            if roll_value == None:
+                die: Die = Die(20)
+                roll_value = die.roll()
+
+            orderDB.add_order_command(user_id, char_name, roll_value, modifier)
+
+            #Show the initiative embed after adding if show is True
+            if show:
+                embed = get_initiative_embed(user_id)
+                await interaction.response.send_message(embed=embed)
+            else:
+                msg = f"{char_name} added: roll({roll_value}), modifier({modifier}), initiative({roll_value+modifier})"
+                await interaction.response.send_message(content=msg)
         except Exception as e:
             await interaction.response.send_message("Something went wrong")
+            print(e)
+    
+    @app_commands.command()
+    @app_commands.describe(
+        char_name = "Character name",
+        show = "Show the initiative order after removing"
+        )
+    async def remove(self, interaction: discord.Interaction, char_name: str, show: bool = False):
+        """Remove a character from the initiative order"""
+        user_id = interaction.user.id
+
+        try:
+            usersDB.verify_or_add_user(user_id)
+
+            if orderDB.remove_one_order(user_id, char_name):
+                #Show the initiative embed after removing if show is True
+                if show:
+                    embed = get_initiative_embed(user_id)
+                    await interaction.response.send_message(embed=embed)
+                else:
+                    await interaction.response.send_message(f"{char_name} removed!")
+            else:
+                await interaction.response.send_message(f"{char_name} does not exist")
+        except Exception as e:
+            await interaction.response.send_message(f"Something went wrong")
             print(e)
         
 async def setup(bot: commands.Bot):
