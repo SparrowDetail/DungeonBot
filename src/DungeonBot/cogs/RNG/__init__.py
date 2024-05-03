@@ -8,10 +8,10 @@ from DungeonBot.cogs.RNG.dieImage import rollImage, Die, ACCEPTED_DIE_TYPES
 class RNG(app_commands.Group):
     @app_commands.command()
     @app_commands.describe(
-        die_type = f"Roll a die {ACCEPTED_DIE_TYPES}",
-        amount = "Number of die to roll (1 to 4)"
+        amount = "Number of die to roll (1 to 4)",
+        die_type = f"Type of die to roll {ACCEPTED_DIE_TYPES}"
     )
-    async def roll(self, interaction: discord.Interaction, die_type: int, amount: int):
+    async def roll(self, interaction: discord.Interaction, amount: int, die_type: int):
         """Roll an existing die up to five times"""
         try:
             filename:str = "rollImage.png"
@@ -44,14 +44,14 @@ class RNG(app_commands.Group):
     
     @app_commands.command()
     @app_commands.describe(
-        head = "Max value (i.e. '100' will generate a number 1 to 100)",
-        amount = "Amount of values to generate (1 to 25)"
+        amount = "Amount of values to generate (1 to 10)",
+        head = "Max value (i.e. '100' will generate a number 1 to 100)"
     )
-    async def random(self, interaction: discord.Interaction, head: int, amount: int):
-        """Generate 1 to 25 random numbers of any size"""
+    async def random(self, interaction: discord.Interaction, amount: int, head: int):
+        """Generate 1 to 10 random numbers of any size"""
         try:
-            if not (amount >= 1 and amount <= 25):
-                await interaction.response.send_message("I can only generate 1 to 25 random values!")
+            if not (amount >= 1 and amount <= 10):
+                await interaction.response.send_message("I can only generate 1 to 10 random values!")
                 return
             if not head > 0:
                 await interaction.response.send_message("Head must be a positive integer greater than 0")
