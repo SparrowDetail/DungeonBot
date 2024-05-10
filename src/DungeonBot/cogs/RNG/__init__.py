@@ -8,10 +8,10 @@ from DungeonBot.cogs.RNG.dieImage import rollImage, Die, ACCEPTED_DIE_TYPES
 class RNG(app_commands.Group):
     @app_commands.command()
     @app_commands.describe(
-        amount = "Number of die to roll (1 to 4)",
+        amount = "Number of die to roll (1 to 5)",
         die_type = f"Type of die to roll {ACCEPTED_DIE_TYPES}"
     )
-    async def roll(self, interaction: discord.Interaction, amount: int, die_type: int):
+    async def roll(self, interaction: discord.Interaction, die_type: int, amount: int = 1 ):
         """Roll an existing die up to five times"""
         try:
             filename:str = "rollImage.png"
@@ -44,10 +44,10 @@ class RNG(app_commands.Group):
     
     @app_commands.command()
     @app_commands.describe(
-        amount = "Amount of values to generate (1 to 10)",
-        head = "Max value (i.e. '100' will generate a number 1 to 100)"
+        head = "Max value (i.e. '100' will generate a number 1 to 100)",
+        amount = "Amount of values to generate (1 to 10)"
     )
-    async def random(self, interaction: discord.Interaction, amount: int, head: int):
+    async def random(self, interaction: discord.Interaction, head: int, amount: int = 1):
         """Generate 1 to 10 random numbers of any size"""
         try:
             if not (amount >= 1 and amount <= 10):
