@@ -37,17 +37,15 @@ the table.
 ### `/initiative show`
 Generate and display an embed containing the users initiative rolls
 
-### `/initiative add` and `/initiative add_show`
-Commands used to add characters to the initiative order. Requires the user to enter a character name (string) and a roll modifier (integer). The `add`
-command will simply add the data to the table, while the `add_show` command will add the data and generate a new embed to display to the users.
+### `/initiative add`
+Command used to add characters to the initiative order. Requires the user to enter a character name (string) and up to three optional values:
+modifier, roll_value, and/or show. The modifier represents the value of the character's initiative modifier (typically DEX modifier), roll_value
+allows the user to enter a specific roll for those that prefer real-world dice rolling, and show elects weather or not to display the initiative order
+after adding (False by default).
 
-### `/initiative insert`
-Functions similarly to `/initiative add`, but allows the user to enter a custom roll value. This was implemented for those that wish to roll realworld
-dice over computer generated random values.
-
-### `/initiative remove` and `/initiative remove_show`
-Commands used to remove characters from the initiative order. Requires the user to enter a character name (string) that they wish to remove. The `remove`
-command will simply remove the data from the table, while the `remove_show` command will remove the data and generate a new embed to display to the users.
+### `/initiative remove`
+Command used to remove characters from the initiative order. Requires the user to enter a character name (string) that they wish to remove and optionally 
+show the initiative order afterwards (similar to the `add` command).
 
 ### `/initiative clear`
 Removes all initiative roll entries for the user
