@@ -111,6 +111,42 @@ class initiative(app_commands.Group):
         except Exception as e:
             await interaction.response.send_message(f"Something went wrong")
             print(e)
+
+    @app_commands.command(description="Update a character's data")
+    @app_commands.describe(
+        char_name = "Character you are updating",
+        change_name = "Enter a new name for the character",
+        roll_value = "Manually enter a new roll value",
+        auto_roll = "Generate a new roll value (overrides a manually entered value)",
+        modifier = "Enter a new modifier (will also generate a new roll value)",
+        show = "Show the initiative order after updating (false by default)"
+    )
+    async def update(self, interaction: discord.Interaction, char_name: str, change_name:str = None, roll_value: int = None, auto_roll:bool = False, modifier: int = None, show: bool = False):
+        """Update a character's data"""
+        user_id = interaction.user.id
+
+        try:
+            usersDB.verify_or_add_user(user_id)
+            char_id = orderDB.get_character_id(user_id, char_name)
+
+            if (char_id != None):
+                if(auto_roll):
+                    die:Die = Die(20)
+                    roll_value = die.roll()
+                if orderDB.update_character_by_id(char_id, change_name, roll_value, modifier):
+                    if(show):
+                        embed = get_initiative_embed(user_id)
+                        await interaction.response.send_message(embed=embed)
+                    else:
+                        data = orderDB.get_character_by_id(char_id)
+                        await interaction.response.send_message(f"Updated: name ({data[0]}), roll ({data[1]}), and modifier ({data[2]})")
+                else:
+                    await interaction.response.send_message(f"You must enter at least one optional value to edit {char_name}!")
+            else:
+                await interaction.response.send_message(f"{char_name} does not exist")
+        except Exception as e:
+            await interaction.response.send_message(f"Something went wrong")
+            print(e)
         
 async def setup(bot: commands.Bot):
     cmd_name = "initiative"
