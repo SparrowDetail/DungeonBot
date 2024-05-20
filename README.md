@@ -22,7 +22,7 @@ You can download the code manually as a zip file on the DungeonBot Github page o
 `git clone https://github.com/SparrowDetail/DungeonBot.git`
 
 ### Step 2: Setup your virtual environment
-It is recommended to run the bot within a (virtual environment)[https://docs.python.org/3/library/venv.html] to prevent Pillow(Fork) from interfering with any 
+It is recommended to run the bot within a [virtual environment](https://docs.python.org/3/library/venv.html) to prevent Pillow(Fork) from interfering with any 
 default versions of Pillow on your system.
 
 Create your virtual environment by executing the following command within the `src/` directory of the DungeonBot project:
@@ -108,6 +108,10 @@ after adding (False by default).
 ### `/initiative remove`
 Command used to remove characters from the initiative order. Requires the user to enter a character name (string) that they wish to remove and optionally 
 show the initiative order afterwards (similar to the `add` command).
+
+### `/initiative update`
+Command used to update a characters information without having to remove and add the character again. Uses optional values to make changes the the character's
+name, roll value, modifier, and so on.
 
 ### `/initiative clear`
 Removes all initiative roll entries for the user
